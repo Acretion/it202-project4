@@ -84,7 +84,7 @@
         <input id="countryText" list="datalist" type="text" placeholder="Country">
         <datalist id="datalist"></datalist>
         <input id="appendCountry" onclick="appendToList()" type="button" href="#btn1" value="Add">
-        <input id="graphData" onclick="graphCountries()" type="submit" href="#btn2" value="Graph!">
+        <input id="graphData" onclick="graphCountries()" type="button" href="#btn2" value="Graph!">
         </form> 
         
         <p>Countries Submitted:</p>
@@ -155,17 +155,19 @@
 //           console.log(cDatalist)
       })
       
-//       Append Country Data      
+//       Append Country Data   
+      var countryArray = [];   
       function appendToList() {
           let addCountry = document.getElementById('countryText');
          
           var node = document.createElement("LI")
           var textnode = document.createTextNode(addCountry.value);       
           node.appendChild(textnode); 
-          document.getElementById("countryList").appendChild(node)        
+          document.getElementById("countryList").appendChild(node);
+          countryArray.push(addCountry.value)
 //           console.log(addCountry.value)
+             console.log(countryArray)
 };    
-
       </script>
   </body>
 </html>
