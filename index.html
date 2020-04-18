@@ -21,6 +21,9 @@
       
 /*     #home {display: block} */
       #Search {display:block}
+/*       #Tables {display:block} */
+/*       #Graph {display:block} */
+      
   </style>
 
   </head>
@@ -77,10 +80,9 @@
         <h1>Select Countries</h1>
         <p>Use this page to select any and all countries that have been affected by Covid-19</p>
         <p>Add in the countries you want to see below. When you're all set, hit graph to see your data!</p>
-    <form action="/action_page.php" method="get">
-        <input id="country" type="text" list="json-datalist" autofocus autocomplete="on" placeholder="Country">
-        <datalist id="json-datalist">
-        </datalist>
+    <form class='form' action="/action_page.php" method="get" name='country_form'>
+        <input id="countryText" list="datalist" type="text" placeholder="Country">
+        <datalist id="datalist"></datalist>
         <input id="appendCountry" onclick="appendToList()" type="button" href="#btn1" value="Add">
         <input id="graphData" onclick="graphCountries()" type="submit" href="#btn2" value="Graph!">
         </form> 
@@ -92,11 +94,13 @@
 <!--   3     -->
     <div id="Tables" class="view">
         <h1>Data Tables</h1>
+        <p>All selected countries will appear here.</p>
       </div>
       
 <!--   4    -->
     <div id="Graph" class="view">
         <h1>Covid-19 Graphs</h1>
+        <p>All selected countries will appear here.</p>
       </div>    
   </main>
       
@@ -129,32 +133,39 @@
         })
     })
       
-//       Append Country Data
-      function appendToList() {
-          let addCountry = document.getElementById('country');
+//      Datalist from json
+      const apiEndPoint = "https://pomber.github.io/covid19/timeseries.json"
+      
+      fetch(apiEndPoint)
+  .then((response) => {
+          return response.json();
+      })
+      .then((data) => {
           
+//           console.log(data)
+       let cDatalist = document.querySelector('datalist')
+       var x; 
+       var list = '';
+       for (x in data) {   
+           list += '<option value="' + x + '"/>';
+           cDatalist.innerHTML = list;
+//            console.log(x)
+//            console.log(list)
+       }
+//           console.log(cDatalist)
+      })
+      
+//       Append Country Data      
+      function appendToList() {
+          let addCountry = document.getElementById('countryText');
+         
           var node = document.createElement("LI")
           var textnode = document.createTextNode(addCountry.value);       
           node.appendChild(textnode); 
-          document.getElementById("countryList").appendChild(node)
+          document.getElementById("countryList").appendChild(node)        
 //           console.log(addCountry.value)
-};
-      
-//       Dexie DB  
-      const db = new Dexie('CountryList'); 
-      db.version(1).stores({
-          list: '++id, country, date, confirmed'
-      })
-      
-      
-//          Datalist Data
-    // Get the <datalist> and <input> elements.
-    
-    const apiEndpoint = 'https://pomber.github.io/covid19/timeseries.json'
-      
-    var dataList = document.getElementById('json-datalist');
-    var input = document.getElementById('ajax');
-      
+};    
+
       </script>
   </body>
 </html>
