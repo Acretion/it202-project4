@@ -10,49 +10,145 @@
 
   <style>
     :root {
-      --mdc-theme-primary: navy;
+      --mdc-theme-primary: Navy;
     }
 
     body {margin: 0;}
     main {margin-left: 8px;}
+
+    .view {display: none;}
+      
+/*     #home {display: block} */
+      #Search {display:block}
   </style>
 
   </head>
   <body>  
+      
+    <!-- Drawer -->
+    <aside class="mdc-drawer mdc-drawer--modal">
+    <div class="mdc-drawer__content">
+      <nav class="mdc-list">
+        <a class="mdc-list-item mdc-list-item--activated" href="#home" aria-current="page">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
+          <span class="mdc-list-item__text">Home</span>
+        </a>
+        <a class="mdc-list-item" href="#Search">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">search</i>
+          <span class="mdc-list-item__text">Countries</span>
+        </a>
+        <a class="mdc-list-item" href="#Tables">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
+          <span class="mdc-list-item__text">Data Tables</span>
+        </a>
+        <a class="mdc-list-item" href="#Graph">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">trending_up</i>
+          <span class="mdc-list-item__text">Graph</span>
+        </a>
+      </nav>
+    </div>
+  </aside>
+  
+<!-- Top Bar-->
+  <div class="mdc-drawer-scrim"></div>
 <header class="mdc-top-app-bar">
   <div class="mdc-top-app-bar__row">
     <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-      <span class="mdc-top-app-bar__title">Covid-19</span>
+      <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button">menu</button>
+      <span class="mdc-top-app-bar__title">Covid-19 Data Tables</span>
     </section>
-    <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-      <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="search">search</button>
-      <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Data Table">sort</button>
-      <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Graph">trending_up</button>
-    </section>
+    <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar"></section>
   </div>
 </header>
 
 
-
+<!-- Pages -->
   <main class="mdc-top-app-bar--fixed-adjust">
+      
+<!--    1    -->
+    <div id="home" class="view">
+        <h1>Welcome!</h1>
+        <p>This website helps any user see how much Covid-19 has affected the world!</p>
+        <p>All data hosted by <a href="https://github.com/pomber/covid19">https://github.com/pomber/covid19</a></p>
+      </div>
+      
+<!--   2     -->
+    <div id="Search" class="view">
+        <h1>Select Countries</h1>
+        <p>Use this page to select any and all countries that have been affected by Covid-19</p>
+        <p>Add in the countries you want to see below. When you're all set, hit graph to see your data!</p>
+        <form action="/action_page.php">
+            <label for="fname">Country:</label><br>
+            <input type="text" id="ajax" list="json-datalist" placeholder="Country Name">
+            <datalist id="json-datalist"></datalist>
+            <input id="appendCountry" type="submit" value="Add">
+            <input id="graphCountry" type="submit" value="Graph!">
+        </form> 
+        <p id="demo"></p>
+        
+        <p>Countries Submitted:</p>
+      <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+      </div>
+      
+<!--   3     -->
+    <div id="Tables" class="view">
+        <h1>Data Tables</h1>
+      </div>
+      
+<!--   4    -->
+    <div id="Graph" class="view">
+        <h1>Covid-19 Graphs</h1>
+      </div>    
   </main>
-
-
+      
   <script>
-    mdc.ripple.MDCRipple.attachTo(document.querySelector('.foo-button'));
-
+//       Top Bar / Drawer
     mdc.topAppBar.MDCTopAppBar.attachTo(document.querySelector('header.mdc-top-app-bar'));
 
     const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
+
+    const hideViews = () => {
+      document.querySelectorAll("div.view").forEach( (item) => {
+        item.style.display = "none";
+      })
+    }
 
 
     document.querySelector(".mdc-top-app-bar__navigation-icon")
       .addEventListener("click", 
           (e) => {drawer.open = true;}
       );
+
+    document.querySelectorAll('aside.mdc-drawer a.mdc-list-item')
+      .forEach(item => {
+        item.addEventListener('click', event => {
+          
+          hideViews();
+          let target = item.getAttribute("href");
+          document.querySelector(target).style.display = "block";
+          drawer.open = false;
+        })
+    })
+      
+//       Dexie DB  
+      const db = new Dexie('CountryList'); 
+      db.version(1).stores({
+          list: '++id, country, date, confirmed'
+      })
+      
+      
+//          Datalist Data
+    // Get the <datalist> and <input> elements.
+    
+    const apiEndpoint = 'https://pomber.github.io/covid19/timeseries.json'
+      
+    var dataList = document.getElementById('json-datalist');
+    var input = document.getElementById('ajax');
+      
     </script>
-          <h2>Home Page</h2>
-          <p>This hosted data comes from <a href="https://github.com/pomber/covid19">https://github.com/pomber/covid19</a></p>
-      <p>Use this site to help learn how Covid affected the world!</p>
+      
+<!--    Plugins    -->
+      <script src="//code.jquery.com/jquery.min.js"></script>
+	<script src="jquery-json-to-datalist.js"></script>
   </body>
 </html>
