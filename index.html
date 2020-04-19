@@ -6,7 +6,8 @@
     <title>Project 4</title>
   <link href="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css" rel="stylesheet">
   <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
-  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>    
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
   <style>
@@ -66,7 +67,7 @@
 
 
 <!-- Pages -->
-  <main class="mdc-top-app-bar--fixed-adjust">
+      <main class="mdc-top-app-bar--fixed-adjust">
       
 <!--    1    -->
     <div id="home" class="view">
@@ -84,7 +85,7 @@
         <input id="countryText" list="datalist" type="text" placeholder="Country">
         <datalist id="datalist"></datalist>
         <input id="appendCountry" onclick="appendToList()" type="button" href="#btn1" value="Add">
-        <input id="graphData" onclick="graphCountries()" type="button" href="#btn2" value="Graph!">
+        <input id="graphData" onclick="graph()" type="button" href="#btn2" value="Graph!">
         </form> 
         
         <p>Countries Submitted:</p>
@@ -92,17 +93,17 @@
       </div>
       
 <!--   3     -->
-    <div id="Tables" class="view">
+      <div id="Tables" class="view">
         <h1>Data Tables</h1>
-        <p>All selected countries will appear here.</p>
+        <p>All selected countries will appear here:</p>
+          <table id='datatable' class='display' style="width:100%"></table>
       </div>
-      
 <!--   4    -->
     <div id="Graph" class="view">
         <h1>Covid-19 Graphs</h1>
-        <p>All selected countries will appear here.</p>
+        <p>All selected countries will be graphed here.</p>
+        <canvas id="myChart" width="400" height="400"></canvas>
       </div>    
-  </main>
       
   <script>
 //       Top Bar / Drawer
@@ -134,15 +135,15 @@
     })
       
 //      Datalist from json
-      const apiEndPoint = "https://pomber.github.io/covid19/timeseries.json"
+      let EndPoint = "https://pomber.github.io/covid19/timeseries.json"
+      let countryData = [];
       
-      fetch(apiEndPoint)
+      fetch(EndPoint)
   .then((response) => {
           return response.json();
       })
       .then((data) => {
-          
-//           console.log(data)
+          countryData = data
        let cDatalist = document.querySelector('datalist')
        var x; 
        var list = '';
@@ -151,23 +152,95 @@
            cDatalist.innerHTML = list;
 //            console.log(x)
 //            console.log(list)
+//            console.log(data)
        }
 //           console.log(cDatalist)
       })
-      
+          
 //       Append Country Data   
-      var countryArray = [];   
-      function appendToList() {
+      let filter = []; 
+           
+      async function appendToList(apiEndpoint) {
           let addCountry = document.getElementById('countryText');
-         
           var node = document.createElement("LI")
           var textnode = document.createTextNode(addCountry.value);       
           node.appendChild(textnode); 
           document.getElementById("countryList").appendChild(node);
-          countryArray.push(addCountry.value)
-//           console.log(addCountry.value)
-             console.log(countryArray)
-};    
-      </script>
+             filter.push(addCountry.value)    
+//              console.log(filter)
+          
+      const db = new Dexie('MyDatabase');
+      db.version(1).stores({
+         favorites: '++id, title, confirmed, date'
+      });
+          await db.favorites.add({
+              country: addCountry.value
+	});
+             }
+      
+//       Dates
+      let dates = [];
+          fetch('https://pomber.github.io/covid19/timeseries.json')
+          .then(response => response.json())
+          .then(json => {
+              json["US"].forEach(({date}) => 
+                                 dates += (`${date} `)
+                                )}
+               )      
+      
+//       Confirmed
+      let confirms = [];
+          fetch('https://pomber.github.io/covid19/timeseries.json')
+          .then(response => response.json())
+          .then(json => {
+              json[x].forEach(({confirmed}) => 
+                                 confirms += (`${confirmed} `)
+                                )}
+               )    
+      
+      
+//       Graph
+//       var ctx = document.getElementById('myChart').getContext('2d');
+// var myChart = new Chart(ctx, {
+//     type: 'line',
+//     data: {
+//         labels: [],
+//         datasets: [{
+//             label: '# of Covid-19 Cases',
+//             data: [],
+//             backgroundColor: ['black'],
+//             borderColor: ['white'],
+//             borderWidth: 1
+//         }]
+//     },
+//     options: {
+//         scales: {
+//             yAxes: [{
+//                 ticks: {
+//                     beginAtZero: true
+//                 }
+//             }]
+//         }
+//     }
+// });
+      //       Data Table 
+      function graph(chart, label, data) {
+          console.log(dates)
+          console.log(confirms)
+          console.log(filter)
+          
+          
+          
+          
+          
+//           chart.data.labels.push(dates);
+//     chart.data.datasets.forEach((dataset) => {
+//         dataset.data.push(data);
+//     });
+//     chart.update();
+}
+ 
+          </script>
+      </main>
   </body>
 </html>
