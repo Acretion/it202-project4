@@ -82,10 +82,10 @@
         <p>Use this page to select any and all countries that have been affected by Covid-19</p>
         <p>Add in the countries you want to see below. When you're all set, hit graph to see your data!</p>
     <form class='form' action="/action_page.php" method="get" name='country_form'>
-        <input id="countryText" list="datalist" type="text" placeholder="Country">
+        <input id="countryText" list="datalist" type="text" placeholder="Country" required>
         <datalist id="datalist"></datalist>
         <input id="appendCountry" onclick="appendToList()" type="button" href="#btn1" value="Add">
-        <input id="graphData" onclick="graph()" type="button" href="#btn2" value="Graph!">
+        <input id="graphData" onclick="filter(), graph()" type="button" href="#btn2" value="Graph!">
         </form> 
         
         <p>Countries Submitted:</p>
@@ -168,15 +168,27 @@
           document.getElementById("countryList").appendChild(node);
              filter.push(addCountry.value)    
 //              console.log(filter)
+//              console.log(countryData)
           
       const db = new Dexie('MyDatabase');
       db.version(1).stores({
-         favorites: '++id, title, confirmed, date'
+         favorites: '++id, confirmed'
       });
           await db.favorites.add({
               country: addCountry.value
+              
 	});
              }
+      
+//       Filter
+      function filter() {
+        filteredData = filter.map(x => countryData[x])
+          console.log(filter)
+          console.log(filteredData)
+      }
+      
+//       Data Table
+      
       
 //       Dates
       let dates = [];
@@ -187,59 +199,36 @@
                                  dates += (`${date} `)
                                 )}
                )      
-      
-//       Confirmed
-      let confirms = [];
-          fetch('https://pomber.github.io/covid19/timeseries.json')
-          .then(response => response.json())
-          .then(json => {
-              json[x].forEach(({confirmed}) => 
-                                 confirms += (`${confirmed} `)
-                                )}
-               )    
-      
-      
+        
 //       Graph
-//       var ctx = document.getElementById('myChart').getContext('2d');
-// var myChart = new Chart(ctx, {
-//     type: 'line',
-//     data: {
-//         labels: [],
-//         datasets: [{
-//             label: '# of Covid-19 Cases',
-//             data: [],
-//             backgroundColor: ['black'],
-//             borderColor: ['white'],
-//             borderWidth: 1
-//         }]
-//     },
-//     options: {
-//         scales: {
-//             yAxes: [{
-//                 ticks: {
-//                     beginAtZero: true
-//                 }
-//             }]
-//         }
-//     }
-// });
-      //       Data Table 
-      function graph(chart, label, data) {
-          console.log(dates)
-          console.log(confirms)
-          console.log(filter)
-          
-          
-          
-          
-          
-//           chart.data.labels.push(dates);
-//     chart.data.datasets.forEach((dataset) => {
-//         dataset.data.push(data);
-//     });
-//     chart.update();
-}
- 
+             var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Dates'],
+                datasets: [{
+                    label: '# of Covid-19 Cases',
+                    data: [],
+                    backgroundColor: [
+
+                    ],
+                    borderColor: [
+
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+      
           </script>
       </main>
   </body>
